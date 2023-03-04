@@ -43,30 +43,24 @@ class _LoadDummyDataState extends State<LoadDummyData> {
         title: const Text("Load Data"),
       ),
       body: Center(
-          child: Row(
-        children: [
-          FutureBuilder<List<String>>(
-            future: _data,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ListView.builder(
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(snapshot.data![index]),
-                    );
-                  },
-                  itemCount: snapshot.data?.length,
+          child: FutureBuilder<List<String>>(
+        future: _data,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(snapshot.data![index]),
                 );
-              } else if (snapshot.hasError) {
-                return Text("${snapshot.error}");
-              }
+              },
+              itemCount: snapshot.data?.length,
+            );
+          } else if (snapshot.hasError) {
+            return Text("${snapshot.error}");
+          }
 
-              return const CircularProgressIndicator();
-            },
-          ),
-
-          // ElevatedButton(onPressed: onPressed, child: child)
-        ],
+          return const CircularProgressIndicator();
+        },
       )),
     );
   }

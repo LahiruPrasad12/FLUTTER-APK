@@ -1,3 +1,4 @@
+import 'package:crud/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'screens/sample_load/sample_api_data_load.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,7 +23,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Flutter Demo',
-      home: LoadDummyData(),
+      // home: LoadDummyData(),
+      home: LoginPage(),
     );
   }
 }
