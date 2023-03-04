@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/load.dart';
+import 'screens/sample_load/sample_api_data_load.dart';
 
 void main() {
   runApp(const MyApp());
