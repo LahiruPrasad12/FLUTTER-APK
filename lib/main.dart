@@ -23,8 +23,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Flutter Demo',
-      // home: LoadDummyData(),
-      home: LoginPage(),
+      home: LoadDummyData(),
+      // home: LoginPage(),
     );
   }
 }

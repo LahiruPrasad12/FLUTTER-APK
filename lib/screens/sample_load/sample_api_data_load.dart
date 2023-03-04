@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crud/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -36,32 +37,48 @@ class _LoadDummyDataState extends State<LoadDummyData> {
     _data = fetchData();
   }
 
+  _navigateToLogin() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Load Data"),
       ),
-      body: Center(
-          child: FutureBuilder<List<String>>(
-        future: _data,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ListView.builder(
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(snapshot.data![index]),
+      body: Column(
+        children: [
+          Center(
+              child: ElevatedButton(
+            onPressed: _navigateToLogin,
+            child: const Text("Login"),
+          )),
+          Center(
+              child: FutureBuilder<List<String>>(
+            future: _data,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView.builder(
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(snapshot.data![index]),
+                    );
+                  },
+                  itemCount: snapshot.data?.length,
                 );
-              },
-              itemCount: snapshot.data?.length,
-            );
-          } else if (snapshot.hasError) {
-            return Text("${snapshot.error}");
-          }
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              }
 
-          return const CircularProgressIndicator();
-        },
-      )),
+              return const CircularProgressIndicator();
+            },
+          )),
+        ],
+      ),
     );
   }
 }
