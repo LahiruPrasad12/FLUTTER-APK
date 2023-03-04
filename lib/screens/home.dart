@@ -2,7 +2,6 @@
 
 import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crud/loader.dart';
 import 'package:crud/models/student.dart';
 import 'package:crud/repositories/StudentRepository.dart';
@@ -64,13 +63,12 @@ class _HomeState extends State<Home> {
       ),
       body: SafeArea(
         child: StreamBuilder(
-            stream:
-                FirebaseFirestore.instance.collection("students").snapshots(),
+            stream: StudentRepository().listStudents(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const Loader();
               }
-              // List<Student>? listRecipies = snapshot.data;
+              List<Student>? listRecipies = snapshot.data;
               return Padding(
                 padding: const EdgeInsets.all(25),
                 child: Column(
@@ -89,155 +87,133 @@ class _HomeState extends State<Home> {
                       color: Colors.grey[600],
                     ),
                     const SizedBox(height: 20),
-                    ListView(
-                      children: snapshot.data!.docs.map<Widget>((document) {
+                    ListView.separated(
+                      separatorBuilder: (context, index) => Divider(
+                        color: Colors.grey[600],
+                      ),
+                      shrinkWrap: true,
+                      itemCount: listRecipies!.length,
+                      itemBuilder: (context, index) {
                         return ListTile(
-                          title: Text(document['name']),
-                          subtitle: Text(document['birthday']),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {
-                              // StudentRepository().deleteStudent(document.studentId);
+                          onTap: () => {
+                            //This is used to update the task
+                            showDialog(
+                              builder: (context) => SimpleDialog(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 25,
+                                  vertical: 20,
+                                ),
+                                backgroundColor: Colors.grey[800],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                title: Row(
+                                  children: [
+                                    const Text(
+                                      "Update Task",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.cancel,
+                                        color: Colors.grey,
+                                        size: 30,
+                                      ),
+                                      onPressed: () => Navigator.pop(context),
+                                    )
+                                  ],
+                                ),
+                                children: [
+                                  const Divider(),
+                                  TextFormField(
+                                    controller: _nameController,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      height: 1.5,
+                                      color: Colors.white,
+                                    ),
+                                    autofocus: true,
+                                    decoration: const InputDecoration(
+                                      hintText: "enter your name",
+                                      hintStyle:
+                                          TextStyle(color: Colors.white70),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                  TextFormField(
+                                    controller: _birthdayController,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      height: 1.5,
+                                      color: Colors.white,
+                                    ),
+                                    autofocus: true,
+                                    decoration: const InputDecoration(
+                                      hintText: "enter your birthday",
+                                      hintStyle:
+                                          TextStyle(color: Colors.white70),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  SizedBox(
+                                    width: width,
+                                    height: 50,
+                                    child: ElevatedButton(
+                                      onPressed: () async {
+                                        if (_nameController.text.isNotEmpty) {
+                                          await StudentRepository()
+                                              .updateStudent(Student(
+                                                  listRecipies[index].id,
+                                                  _nameController.text.trim(),
+                                                  _birthdayController.text
+                                                      .trim()));
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.pop(context);
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.blue,
+                                        minimumSize: const Size(60, 60),
+                                        elevation: 10,
+                                      ),
+                                      child: const Text("Update"),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              context: context,
+                            ),
+                          },
+                          leading: Text(
+                            listRecipies[index].name,
+                            style: const TextStyle(
+                              fontSize: 25,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          title: Text(
+                            listRecipies[index].birthday,
+                            style: const TextStyle(
+                              fontSize: 25,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          trailing: TextButton(
+                            onPressed: () async {
+                              StudentRepository()
+                                  .deleteStudent(listRecipies[index]);
                             },
+                            child: const Icon(Icons.delete),
                           ),
                         );
-                      }).toList(),
-                      shrinkWrap: true,
-                      // itemCount: listRecipies!.length,
-                      // itemBuilder: (context, index) {
-                      //   return ListTile(
-                      //     onTap: () => {
-                      //       showDialog(
-                      //         builder: (context) => SimpleDialog(
-                      //           contentPadding: const EdgeInsets.symmetric(
-                      //             horizontal: 25,
-                      //             vertical: 20,
-                      //           ),
-                      //           backgroundColor: Colors.grey[800],
-                      //           shape: RoundedRectangleBorder(
-                      //             borderRadius: BorderRadius.circular(20),
-                      //           ),
-                      //           title: Row(
-                      //             children: [
-                      //               const Text(
-                      //                 "Add Task",
-                      //                 style: TextStyle(
-                      //                   fontSize: 20,
-                      //                   color: Colors.white,
-                      //                 ),
-                      //               ),
-                      //               const Spacer(),
-                      //               IconButton(
-                      //                 icon: const Icon(
-                      //                   Icons.cancel,
-                      //                   color: Colors.grey,
-                      //                   size: 30,
-                      //                 ),
-                      //                 onPressed: () => Navigator.pop(context),
-                      //               )
-                      //             ],
-                      //           ),
-                      //           children: [
-                      //             const Divider(),
-                      //             TextFormField(
-                      //               controller: _nameController,
-                      //               style: const TextStyle(
-                      //                 fontSize: 18,
-                      //                 height: 1.5,
-                      //                 color: Colors.white,
-                      //               ),
-                      //               autofocus: true,
-                      //               decoration: const InputDecoration(
-                      //                 hintText: "type your task here",
-                      //                 hintStyle:
-                      //                     TextStyle(color: Colors.white70),
-                      //                 border: InputBorder.none,
-                      //               ),
-                      //             ),
-                      //             TextFormField(
-                      //               controller: _birthdayController,
-                      //               style: const TextStyle(
-                      //                 fontSize: 18,
-                      //                 height: 1.5,
-                      //                 color: Colors.white,
-                      //               ),
-                      //               autofocus: true,
-                      //               decoration: const InputDecoration(
-                      //                 hintText: "type your ingredients here",
-                      //                 hintStyle:
-                      //                     TextStyle(color: Colors.white70),
-                      //                 border: InputBorder.none,
-                      //               ),
-                      //             ),
-                      //             TextFormField(
-                      //               // controller: recipieDescription,
-                      //               style: const TextStyle(
-                      //                 fontSize: 18,
-                      //                 height: 1.5,
-                      //                 color: Colors.white,
-                      //               ),
-                      //               autofocus: true,
-                      //               decoration: const InputDecoration(
-                      //                 hintText: "type your description here",
-                      //                 hintStyle:
-                      //                     TextStyle(color: Colors.white70),
-                      //                 border: InputBorder.none,
-                      //               ),
-                      //             ),
-                      //             const SizedBox(height: 20),
-                      //             SizedBox(
-                      //               width: width,
-                      //               height: 50,
-                      //               child: ElevatedButton(
-                      //                 onPressed: () async {
-                      //                   if (_nameController.text.isNotEmpty) {
-                      //                     await StudentRepository()
-                      //                         .updateStudent(Student(
-                      //                             listRecipies[index].studentID,
-                      //                             _nameController.text.trim(),
-                      //                             _birthdayController.text
-                      //                                 .trim()));
-                      //                     // ignore: use_build_context_synchronously
-                      //                     Navigator.pop(context);
-                      //                   }
-                      //                 },
-                      //                 style: ElevatedButton.styleFrom(
-                      //                   primary: Colors.blue,
-                      //                   minimumSize: const Size(60, 60),
-                      //                   elevation: 10,
-                      //                 ),
-                      //                 child: const Text("Add"),
-                      //               ),
-                      //             )
-                      //           ],
-                      //         ),
-                      //         context: context,
-                      //       ),
-                      //     },
-                      //     leading: Text(
-                      //       listRecipies[index].name,
-                      //       style: const TextStyle(
-                      //         fontSize: 25,
-                      //         color: Colors.black,
-                      //         fontWeight: FontWeight.w600,
-                      //       ),
-                      //     ),
-                      //     title: Text(
-                      //       listRecipies[index].birthday,
-                      //       style: const TextStyle(
-                      //         fontSize: 25,
-                      //         color: Colors.black,
-                      //         fontWeight: FontWeight.w600,
-                      //       ),
-                      //     ),
-                      //     trailing: TextButton(
-                      //       onPressed: () async {
-                      //         await StudentRepository().listStudents();
-                      //       },
-                      //       child: const Icon(Icons.delete),
-                      //     ),
-                      //   );
-                      // },
+                      },
                     )
                   ],
                 ),
@@ -248,6 +224,7 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         onPressed: () {
+          //This is used to add the task
           showDialog(
             builder: (context) => SimpleDialog(
               contentPadding: const EdgeInsets.symmetric(

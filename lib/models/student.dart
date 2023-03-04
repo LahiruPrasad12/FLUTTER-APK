@@ -1,9 +1,9 @@
 class Student {
-  String studentID;
+  String id;
   String name;
   String birthday;
 
-  Student(this.studentID, this.name, this.birthday);
+  Student(this.id, this.name, this.birthday);
 
   Map<String, dynamic> toMap() {
     return {'name': name, 'birthday': birthday};

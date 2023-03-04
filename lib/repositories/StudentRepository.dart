@@ -5,10 +5,13 @@ class StudentRepository {
   final CollectionReference _studentCollection =
       FirebaseFirestore.instance.collection('students');
 
-  List<Student> recipiesList(QuerySnapshot snapshot) {
+  List<Student> studentList(QuerySnapshot snapshot) {
+    snapshot.docs.forEach((element) {
+      print(element.data());
+    });
     return snapshot.docs.map((e) {
       return Student(
-        "1",
+        e.id,
         e.get("name"),
         e.get("birthday"),
       );
@@ -16,7 +19,7 @@ class StudentRepository {
   }
 
   Stream<List<Student>> listStudents() {
-    return _studentCollection.snapshots().map(recipiesList);
+    return _studentCollection.snapshots().map(studentList);
   }
 
   Future<void> addStudent(Student student) {
@@ -24,10 +27,10 @@ class StudentRepository {
   }
 
   Future<void> updateStudent(Student student) {
-    return _studentCollection.doc(student.studentID).update(student.toMap());
+    return _studentCollection.doc(student.id).update(student.toMap());
   }
 
   Future<void> deleteStudent(Student student) {
-    return _studentCollection.doc(student.studentID).delete();
+    return _studentCollection.doc(student.id).delete();
   }
 }
